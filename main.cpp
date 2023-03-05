@@ -4,7 +4,6 @@
 #include "functions.h"
 
 using namespace std;
-
 int main() {
     int faculty, group, course;
     string name;
@@ -18,6 +17,7 @@ int main() {
 
         cout << "Введите факультет: ";
         cin >> faculty;
+        faculty--;
         cout << "Введите курс: ";
         cin >> course;
 
@@ -74,7 +74,10 @@ int main() {
     unsigned char result[bytes];
     for (int i = 0; i < bytes; ++i) {
         int value = *(pointer + i);
-        value = value < 0 ? -1 * value - 1 : value;
+
+        bool isNeg = value < 0 ? 1 : 0;
+        if (isNeg)
+            value = -1 * value - 1;
 
         vector<char> res;
         while (value != 0) {
@@ -84,24 +87,30 @@ int main() {
         while (res.size() < 7)
             res.push_back(0);
 
-        if (value < 0)
+        if (isNeg)
             for (int i = 0; i < 7; ++i)
                 res[i] = !res[i];
 
-        res.push_back(value < 0);
+        res.push_back(isNeg);
 
         reverse(res.begin(), res.end());
 
         for (int j = 0; j < 8; ++j)
-            cout << (int) res[j];
+            cout << (int)res[j];
         cout << " ";
 
-        unsigned char b = 0;
+        unsigned char byte = 0;
         for (int j = 0; j < 8; ++j)
-            b += pow(2, 7 - j) * res[j];
-        *(result + i) = b;
+            byte += pow(2, 7 - j) * res[j];
+        *(result + i) = byte;
     }
-    cout << "Восстанавливаю данные о студентах:" << endl;
+
+    map<int, char> rel_tr;
+    for (int i = 0; i < 26; ++i)
+        rel_tr[i] = (char)(65 + i);
+    rel_tr[26] = ' ';
+
+    cout << "\nВосстанавливаю данные о студентах:" << endl;
     byte_size = 8;
     index = 0;
     for (int i = 0; i < N; ++i) {
@@ -112,7 +121,7 @@ int main() {
 
         char _name[len];
         for (int j = 0; j < len; ++j)
-            _name[j] = rel[(int) read(result, index, byte_size, 5)];
+            _name[j] = rel_tr[(int) read(result, index, byte_size, 5)];
 
         cout << (int) _faq + 1 << "-" << (int) _course << (_group < 10 ? "0" : "") << (int) _group << " ";
         for (int j = 0; j < len; ++j)
